@@ -1,6 +1,6 @@
 from datetime import timezone
 from django.db import models
-
+from django.utils import timezone
 # Create your models here.
 class Vendor(models.Model):
     id = models.AutoField(primary_key=True)
@@ -24,13 +24,13 @@ class Vendor(models.Model):
             hp_entry.save()
     
     def update_on_time_delivery_rate(self):
-        completed_orders_count = self.purchaseorder_set.filter(status='completed').count()
-        on_time_orders_count = self.purchaseorder_set.filter(status='completed', delayed=False).count()
+        completed_orders_count = self.purchase_order.filter(status='completed').count()
+        on_time_orders_count = self.purchase_order.filter(status='completed', delayed=False).count()
         self.on_time_delivery_rate = (on_time_orders_count / completed_orders_count) * 100 if completed_orders_count > 0 else 0
         self.save()
     
     def update_quality_rating_avg(self):
-        completed_orders = self.purchaseorder_set.filter(status='completed', quality_rating__isnull=False)
+        completed_orders = self.purchase_order.filter(status='completed', quality_rating__isnull=False)
         quality_rating_sum = sum(order.quality_rating for order in completed_orders)
         completed_orders_count = completed_orders.count()
         self.quality_rating_avg = quality_rating_sum / completed_orders_count if completed_orders_count > 0 else 0
@@ -38,7 +38,7 @@ class Vendor(models.Model):
     
     def update_average_acknowledgment_time(self):
         total_time_difference = timezone.timedelta(0)
-        acknowledged_orders = self.purchaseorder_set.filter(acknowledgment_date__isnull=False)
+        acknowledged_orders = self.purchase_order.filter(acknowledgment_date__isnull=False)
         for order in acknowledged_orders:
             time_difference = order.acknowledgment_date - order.issue_date
             total_time_difference += time_difference
@@ -47,8 +47,8 @@ class Vendor(models.Model):
         self.save()    
     
     def update_fulfilment_rate(self):
-        total_orders_count = self.purchaseorder_set.count()
-        fulfilled_orders_count = self.purchaseorder_set.filter(status='completed', delayed=False).count()
+        total_orders_count = self.purchase_order.count()
+        fulfilled_orders_count = self.purchase_order.filter(status='completed', delayed=False).count()
         self.fulfilment_rate = (fulfilled_orders_count / total_orders_count) * 100 if total_orders_count > 0 else 0
         self.save()
              
@@ -70,7 +70,7 @@ class PurchaseOrder(models.Model):
     quantity = models.IntegerField()
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     quality_rating = models.FloatField(null=True, blank=True)
-    issue_date = models.DateTimeField()
+    issue_date = models.DateTimeField(auto_now_add=True)
     acknowledgment_date = models.DateTimeField(null=True, blank=True)
     delayed = models.BooleanField(default=False, verbose_name="Delayed")
     
