@@ -32,7 +32,7 @@ def get_vendor(request, vendor_id):
     elif request.method == 'PUT':
         try:
             vendor = Vendor.objects.get(id=vendor_id)
-            serializer = VendorSerializer(vendor, data=request.data)
+            serializer = VendorSerializer(vendor, data=request.data,partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -64,4 +64,30 @@ def po_list(request):
  
 @api_view(['GET','PUT','DELETE'])
 def  get_po(request,po_id):
-    pass
+    if request.method == 'GET':
+        try:
+            po = PurchaseOrder.objects.get(id=po_id)
+            serializer = PurchaseOrderSerializer(po)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except PurchaseOrder.DoesNotExist:
+            return Response({"error": "Purchase Order not found"}, status=status.HTTP_404_NOT_FOUND)  
+    elif request.method == 'PUT':
+        try:
+            po = PurchaseOrder.objects.get(id=po_id)
+            serializer = PurchaseOrderSerializer(po, data=request.data,partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except PurchaseOrder.DoesNotExist:
+            return Response({"error": "Purchase Order not found"}, status=status.HTTP_404_NOT_FOUND)
+    elif request.method == 'DELETE':
+        try:
+            po = PurchaseOrder.objects.get(id=po_id)
+            po.delete()
+            return Response({"msg":"Purchase Order Deleted"}, status=status.HTTP_204_NO_CONTENT)
+        except PurchaseOrder.DoesNotExist:
+            return Response({"error": "Purchase Order not found"}, status=status.HTTP_404_NOT_FOUND)
+
+

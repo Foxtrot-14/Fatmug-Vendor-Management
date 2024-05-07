@@ -81,7 +81,7 @@ class PurchaseOrder(models.Model):
         self.vendor.update_fulfilment_rate()
         if self.status == 'completed':
             self.actual_delivery_date = timezone.now() 
-            if self.actual_delivery_date > self.expected_delivery_date:
+            if self.actual_delivery_date > self.delivery_date:
                 self.delayed = True
         super().save(*args, **kwargs)
         if self.status == 'completed':
