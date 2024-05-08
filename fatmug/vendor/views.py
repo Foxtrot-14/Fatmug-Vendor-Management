@@ -1,10 +1,28 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.models import User
 from .models import Vendor,PurchaseOrder,HistoricalPerformance
 from .serializer import VendorSerializer,PurchaseOrderSerializer,HistoricalPerformanceSerializer
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+
+@api_view(['POST'])
+@permission_classes([])
+def login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(username=username, password=password)
+    if user:
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key})
+    else:
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
 def vendor_list(request):
     if request.method == 'GET':
         vendors = Vendor.objects.all()
@@ -19,6 +37,7 @@ def vendor_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET','PUT','DELETE'])
+@permission_classes([IsAuthenticated])
 def get_vendor(request, vendor_id):
     if request.method == 'GET':
         try:
@@ -47,6 +66,7 @@ def get_vendor(request, vendor_id):
             return Response({"error": "Vendor not found"}, status=status.HTTP_404_NOT_FOUND)
         
 @api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
 def po_list(request):
     if request.method == 'GET':
         vendors = PurchaseOrder.objects.all()
@@ -61,6 +81,7 @@ def po_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
  
 @api_view(['GET','PUT','DELETE'])
+@permission_classes([IsAuthenticated])
 def  get_po(request,po_id):
     if request.method == 'GET':
         try:
@@ -89,6 +110,7 @@ def  get_po(request,po_id):
             return Response({"error": "Purchase Order not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_performance(request,vendor_id):
     if request.method == 'GET':
         try:

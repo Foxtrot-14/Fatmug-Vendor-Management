@@ -4,6 +4,22 @@ This API allows you to manage vendors and their historical performance records.
 
 ## Endpoints
 
+## Authentication
+
+To authenticate requests, use token-based authentication.
+
+### Generate Token (Login)
+
+- **URL:** `/auth/`
+- **Method:** POST
+- **Description:** Generate a token for authentication.
+- **Request Body:** 
+```json
+{
+  "username": "guest",
+  "password": "beztcbeztc"
+}
+```
 ### Get Vendors
 
 - **URL:** `/api/vendors/`
