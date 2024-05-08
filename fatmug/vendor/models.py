@@ -15,14 +15,15 @@ class Vendor(models.Model):
     
     def save(self, *args, **kwargs):
         super(Vendor, self).save(*args, **kwargs)
-        hp_entries = HistoricalPerformance.objects.filter(vendor=self)
-        for hp_entry in hp_entries:
-            hp_entry.on_time_delivery_rate = self.on_time_delivery_rate
-            hp_entry.quality_rating_avg = self.quality_rating_avg
-            hp_entry.average_response_time = self.average_response_time
-            hp_entry.fulfillment_rate = self.fulfillment_rate
-            hp_entry.save()
-    
+        HistoricalPerformance.objects.create(
+                vendor=self,
+                on_time_delivery_rate=self.on_time_delivery_rate,
+                quality_rating_avg=self.quality_rating_avg,
+                average_response_time=self.average_response_time,
+                fulfillment_rate=self.fulfillment_rate
+            )
+            
+        
     def update_on_time_delivery_rate(self):
         completed_orders_count = self.purchase_order.filter(status='completed').count()
         on_time_orders_count = self.purchase_order.filter(status='completed', delayed=False).count()
@@ -50,8 +51,7 @@ class Vendor(models.Model):
         total_orders_count = self.purchase_order.count()
         fulfilled_orders_count = self.purchase_order.filter(status='completed', delayed=False).count()
         self.fulfilment_rate = (fulfilled_orders_count / total_orders_count) * 100 if total_orders_count > 0 else 0
-        self.save()
-             
+        self.save()         
     def __str__(self):
         return self.name
 
@@ -92,11 +92,11 @@ class PurchaseOrder(models.Model):
 
 class HistoricalPerformance(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='historical_performances')
-    date = models.DateTimeField()
-    on_time_delivery_rate = models.FloatField()
-    quality_rating_avg = models.FloatField()
-    average_response_time = models.FloatField()
-    fulfillment_rate = models.FloatField()
+    date = models.DateTimeField(auto_now_add=True)
+    on_time_delivery_rate = models.FloatField(blank=True,null=True)
+    quality_rating_avg = models.FloatField(blank=True,null=True)
+    average_response_time = models.FloatField(blank=True,null=True)
+    fulfillment_rate = models.FloatField(blank=True,null=True)
     
     def __str__(self):
         return f"{self.vendor.name} - {self.date}"        

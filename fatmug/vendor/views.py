@@ -1,11 +1,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Vendor,PurchaseOrder
-from .serializer import VendorSerializer
-from .serializer import PurchaseOrderSerializer
+from .models import Vendor,PurchaseOrder,HistoricalPerformance
+from .serializer import VendorSerializer,PurchaseOrderSerializer,HistoricalPerformanceSerializer
 
-# Create your views here.
 @api_view(['GET','POST'])
 def vendor_list(request):
     if request.method == 'GET':
@@ -90,4 +88,12 @@ def  get_po(request,po_id):
         except PurchaseOrder.DoesNotExist:
             return Response({"error": "Purchase Order not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
+@api_view(['GET'])
+def get_performance(request,vendor_id):
+    if request.method == 'GET':
+        try:
+            hp = HistoricalPerformance.objects.get(vendor=vendor_id)
+            serializer = HistoricalPerformanceSerializer(hp)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except HistoricalPerformance.DoesNotExist:
+            return Response({"error": "Historical Performance not found"}, status=status.HTTP_404_NOT_FOUND)
