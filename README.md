@@ -16,55 +16,122 @@ This API allows you to manage vendors and their historical performance records.
 - **URL:** `/api/vendors/`
 - **Method:** POST
 - **Description:** Add a new vendor.
-- **Request Body:** JSON object containing details of the vendor to be added (name, contact details, address, vendor code).
+- **Request Body:**
+```json
+  {
+  "name": "Example Vendor",
+  "contact_details": "example@example.com",
+  "address": "123 Example St, Example City",
+  "vendor_code": "EX123"
+  }
+```
 - **Response:** Returns the details of the newly added vendor if successful.
-
-### Get Historical Performance
-
-- **URL:** `/api/historical-performance/`
-- **Method:** GET
-- **Description:** Retrieve historical performance records for all vendors.
-- **Response:** Returns a list of historical performance records for all vendors.
-
-### Add Historical Performance
-
-- **URL:** `/api/historical-performance/`
-- **Method:** POST
-- **Description:** Add a new historical performance record for a vendor.
-- **Request Body:** JSON object containing details of the historical performance record (vendor ID, date, on-time delivery rate, quality rating average, average response time, fulfillment rate).
-- **Response:** Returns the details of the newly added historical performance record if successful.
-
-### Update Vendor
-
-- **URL:** `/api/vendors/<vendor_id>/`
-- **Method:** PUT, PATCH
-- **Description:** Update an existing vendor's details.
-- **Request Body:** JSON object containing the updated details of the vendor.
-- **Response:** Returns the details of the updated vendor if successful.
-
-### Delete Vendor
-
-- **URL:** `/api/vendors/<vendor_id>/`
-- **Method:** DELETE
-- **Description:** Delete an existing vendor.
-- **Response:** Returns a success message if the vendor is deleted successfully.
 
 ### Get Vendor by ID
 
-- **URL:** `/api/vendors/<vendor_id>/`
+- **URL:** `/api/vendors/<int:vendor_id>/`
 - **Method:** GET
 - **Description:** Retrieve details of a specific vendor by its ID.
 - **Response:** Returns the details of the specified vendor.
 
-### Add Performance for Vendor
+### Update Vendor
 
-- **URL:** `/api/vendors/<vendor_id>/add-performance/`
+- **URL:** `/api/vendors/<int:vendor_id>/`
+- **Method:** PUT
+- **Description:** Update an existing vendor's details.
+- **Request Body:** 
+```json
+{
+  "name": "Updated Vendor Name",
+  "contact_details": "updated@example.com",
+  "address": "456 Updated St, Updated City",
+  "vendor_code": "UPD456"
+}
+```
+- **Response:** Returns the details of the updated vendor if successful.
+
+### Delete Vendor
+
+- **URL:** `/api/vendors/<int:vendor_id>/`
+- **Method:** DELETE
+- **Description:** Delete an existing vendor.
+- **Response:** Returns a success message if the vendor is deleted successfully.
+
+### Get Purchase Orders
+
+- **URL:** `/api/purchase_orders/`
+- **Method:** GET
+- **Description:** Retrieve a list of all Purchase Order.
+- **Response:** Returns a list of Purchase Order with their details.
+
+### Add Purchase Orders
+
+- **URL:** `/api/purchase_orders/`
 - **Method:** POST
-- **Description:** Add historical performance records for a specific vendor.
-- **Request Body:** JSON object containing details of the historical performance record (date, on-time delivery rate, quality rating average, average response time, fulfillment rate).
-- **Response:** Returns the details of the newly added historical performance record if successful.
+- **Description:** Add a new vendor.
+- **Request Body:**
+```json
+{
+  "po_number": "PO123",
+  "vendor": 1,
+  "order_date": "2024-05-07T08:00:00Z",
+  "delivery_date": "2024-05-14T08:00:00Z",
+  "items": [
+    {"name": "Item 1", "quantity": 10},
+    {"name": "Item 2", "quantity": 20}
+  ],
+  "quantity": 2,
+  "status": "pending",
+  "issue_date": "2024-05-07T08:00:00Z"
+}
+
+```
+- **Response:** Returns the details of the newly added Purchase Order if successful.
+
+### Get Purchase Orders by ID
+
+- **URL:** `/api/purchase_orders/<int:po_id>/`
+- **Method:** GET
+- **Description:** Retrieve details of a specific Purchase Order by its ID.
+- **Response:** Returns the details of the specified Purchase Order.
+
+### Update Purchase Orders
+
+- **URL:** `/api/purchase_orders/<int:po_id>/`
+- **Method:** PUT
+- **Description:** Update an existing Purchase Order's details.
+- **Request Body:** 
+```json
+{
+  "po_number": "PO123",
+  "vendor": 1,
+  "order_date": "2024-05-07T08:00:00Z",
+  "delivery_date": "2024-05-14T08:00:00Z",
+  "items": [
+    {"name": "Item 1", "quantity": 10},
+    {"name": "Item 2", "quantity": 20}
+  ],
+  "quantity": 2,
+  "status": "completed",
+  "issue_date": "2024-05-07T08:00:00Z"
+}
+```
+- **Response:** Returns the details of the updated Purchase Order if successful.
+
+### Delete Purchase Orders
+
+- **URL:** `/api/purchase_orders/<int:po_id>/`
+- **Method:** DELETE
+- **Description:** Delete an existing Purchase Order.
+- **Response:** Returns a success message if the Purchase Order is deleted successfully.
+
+### Get Historical Performance
+
+- **URL:** `/api/vendors/<int:vendor_id>/performance`
+- **Method:** GET
+- **Description:** Retrieve historical performance records for all vendors.
+- **Response:** Returns a list of historical performance records for all vendors.
 
 ## Authentication
 
-- Authentication is required for certain endpoints (e.g., add/update/delete vendor).
-- Use token-based authentication (e.g., JWT) to authenticate requests.
+- Use token-based authentication to authenticate requests.
